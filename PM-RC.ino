@@ -13,6 +13,7 @@
 #define SERVICE_UUID        "bc2f4cc6-aaef-4351-9034-d66268e328f0"
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
 
+#define DPRINTB16(Num) for (unsigned int t = 0x8000; t; t >>= 1) Serial.write(Num  & t ? '1' : '0'); // Prints a 16 bit binary number with leading zeros
 
 class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
@@ -21,9 +22,33 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       if (value.length() > 0) {
         Serial.println("*********");
         Serial.print("New value: ");
-        for (int i = 0; i < value.length(); i++)
-          Serial.print(value[i]);
-
+        /*for (int i = 0; i < value.length(); i++){
+          Serial.print(value[i],HEX);
+          Serial.print("-");
+          //byte val = value[i];
+          //DPRINTB16(val);
+        }
+        */
+        switch (value[0]){
+          case 0x40:
+            Serial.print ("Stering: ");
+            break;
+          case  0x24:
+            Serial.print ("light: ");
+            break;
+          case  0x23:
+            Serial.print ("motor: ");
+            break;
+          case  0x25:
+            Serial.print ("speed: ");
+            break;
+          default:
+            Serial.print(value[0],HEX);
+            Serial.print("-");
+        
+          
+        }
+        Serial.print(value[1],HEX);
         Serial.println();
         Serial.println("*********");
       }
@@ -32,14 +57,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
 void setup() {
   Serial.begin(115200);
-
-  Serial.println("1- Download and install an BLE scanner app in your phone");
-  Serial.println("2- Scan for BLE devices in the app");
-  Serial.println("3- Connect to MyESP32");
-  Serial.println("4- Go to CUSTOM CHARACTERISTIC in CUSTOM SERVICE and write something");
   Serial.println("5- See the magic =)");
-
-  BLEDevice::init("PM-RC 0E6EB");
+  
+  BLEDevice::init("PM-RC ESP32");
   BLEServer *pServer = BLEDevice::createServer();
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
