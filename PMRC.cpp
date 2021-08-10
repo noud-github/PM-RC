@@ -12,6 +12,7 @@ PMRC::PMRC(String name)
  
   _name = name;
   _lightOn = false;
+  _speed = 0x3;
 }
 
 void PMRC::setLight(bool value)
@@ -27,6 +28,17 @@ void PMRC::setLight(bool value)
     _lightOn = value;
   }
 }
+
+void PMRC::setSpeed(byte value)
+{
+  if ( _speed != value ) {
+    _speed = value;
+    Serial.print("newspeed: ");
+    Serial.println(value, HEX);
+  }
+}
+
+
 
 void PMRC::dash()
 {

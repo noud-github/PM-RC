@@ -15,12 +15,14 @@ class PMRC
     PMRC(String name);
     void setLight(bool value);
     bool getLight();
+    void setSpeed(byte value);
     void dash();
     String getName();
     
   private:
     String _name;
-    byte _lightOn;
+    bool _lightOn;
+    byte _speed;
 };
 
 #endif

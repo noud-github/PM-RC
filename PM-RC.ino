@@ -1,7 +1,3 @@
-/*
-    Based on Neil Kolban example for IDF: https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleWrite.cpp
-    Ported to Arduino ESP32 by Evandro Copercini
-*/
 
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -12,16 +8,9 @@
 
 #define SERVICE_UUID        "bc2f4cc6-aaef-4351-9034-d66268e328f0"
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
-
-
-
 #define LED_BUILTIN 2
 
 volatile boolean deviceConnected = false;
-volatile boolean setLightOn = false;
-boolean lightOn = false;
-volatile byte setSpeed = 0x3;
-byte speed = 0x3;
 
 PMRC pmrc("ESP32");
 
@@ -49,13 +38,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             Serial.print ("light: ");
             if (deviceConnected) { 
               pCharacteristic->notify(); 
-              if ( value[1] == 0x2 ){
-                setLightOn = true;
-                pmrc.setLight(true);
-              } else {
-                setLightOn = false;
-                pmrc.setLight(false);
-              } 
+              pmrc.setLight(value[1] == 0x2);
             }
             break;
           case  0x23:
@@ -65,7 +48,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             Serial.print ("speed: ");
             if (deviceConnected) { 
               pCharacteristic->notify();  
-              setSpeed =  value[1];
+              pmrc.setSpeed(value[1]);
             }
             break;
           default:
@@ -112,13 +95,7 @@ void setup() {
   pService->start();
 
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  
-
   pAdvertising->addServiceUUID(SERVICE_UUID);
-  //pAdvertising->setScanResponse(true);
-  //pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
-  //pAdvertising->setMinPreferred(0x12);
- ;
   pAdvertising->start();
 
 }
@@ -126,25 +103,7 @@ void setup() {
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  /*
-  if (lightOn != setLightOn){
-    if (setLightOn) {
-      digitalWrite(LED_BUILTIN, HIGH);  
-      Serial.println("light_on");
-      
-    } else {
-      digitalWrite(LED_BUILTIN, LOW);
-      Serial.println("light_off");
-    }
-    lightOn = setLightOn;
-  }
-  */
-  if ( setSpeed != speed ) {
-    Serial.print("speed: ");
-    Serial.println(setSpeed,HEX);
-    speed = setSpeed;
-  }
+  // put your main code here, to run repeatedly
 
-  delay(500);
+  delay(2000);
 }
