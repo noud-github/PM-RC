@@ -4,15 +4,22 @@
 #include <BLEServer.h>
 #include <BLE2902.h>
 #include "PMRC.h"
-
+#include <ESP32Servo.h>
 
 #define SERVICE_UUID        "bc2f4cc6-aaef-4351-9034-d66268e328f0"
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
 #define LED_BUILTIN 2
 
 volatile boolean deviceConnected = false;
+volatile byte val = 0x7F;
 
 PMRC pmrc("ESP32");
+Servo myservo;
+
+int pos = 0;    // variable to store the servo position
+// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
+int servoPin = 23;
+
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -27,15 +34,15 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string value = pCharacteristic->getValue();
 
-      if (value.length() > 0) {
-        //Serial.println("*********");
-        //Serial.print("New value: ");
+      if (value.length() == 3 ) {
         switch (value[0]){
           case 0x40:
-            //Serial.print ("Stering: ");
+            Serial.print ("Steering: ");
+            Serial.print(value[1],HEX);
+            val = value[1];
             break;
           case  0x24:
-            Serial.print ("light: ");
+            //Serial.print ("light: ");
             if (deviceConnected) { 
               pCharacteristic->notify(); 
               pmrc.setLight(value[1] == 0x2);
@@ -45,7 +52,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             Serial.print ("motor: ");
             break;
           case  0x25:
-            Serial.print ("speed: ");
+            //Serial.print ("speed: ");
             if (deviceConnected) { 
               pCharacteristic->notify();  
               pmrc.setSpeed(value[1]);
@@ -54,14 +61,10 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           default:
             Serial.print(value[0],HEX);
             Serial.print("-");
+            Serial.print(value[1],HEX);
             break;
           
-        }
-        
-        //Serial.print(value[1],HEX);
-        //Serial.println();
-        //Serial.println("*********");
-        
+        }       
       }
     }
 };
@@ -69,9 +72,13 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-  Serial.println("5- See the magic =)");
   Serial.println(pmrc.getName());
-  //digitalWrite(LED_BUILTIN, HIGH);
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(servoPin, 600, 2500); // attaches the servo on pin 18 to the servo object
   BLEDevice::init("PM-RC ESP32");
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
@@ -85,17 +92,18 @@ void setup() {
                                          BLECharacteristic::PROPERTY_WRITE_NR
                                        );
 
-  BLEDescriptor *pDescriptor1 = new BLEDescriptor((uint16_t)0x2902); // Characteristic Presentation Format
+  BLEDescriptor *pDescriptor = new BLEDescriptor((uint16_t)0x2902); // Characteristic Presentation Format
  
-  pCharacteristic->addDescriptor(pDescriptor1);
+  pCharacteristic->addDescriptor(pDescriptor);
                                        
   pCharacteristic->setCallbacks(new MyCallbacks());
 
-  pCharacteristic->setValue("Hello World");
   pService->start();
 
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
+
   pAdvertising->addServiceUUID(SERVICE_UUID);
+  
   pAdvertising->start();
 
 }
@@ -104,6 +112,20 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly
-
-  delay(2000);
+  /*
+  for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    myservo.write(pos);    // tell servo to go to position in variable 'pos'
+    delay(15);             // waits 15ms for the servo to reach the position
+  }
+  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(pos);    // tell servo to go to position in variable 'pos'
+    delay(15);             // waits 15ms for the servo to reach the position
+  */
+  //delay(2000);
+  
+  int pos = map(val, 0, 0xFF, 45, 135);     // scale it to use it with the servo (value between 0 and 180)
+  myservo.write(pos);                  // set the servo position according to the scaled value
+  delay(200);                          // wait for the servo to get there
+  
 }
