@@ -6,10 +6,16 @@
 
 #include "Arduino.h"
 #include "PMRC.h"
+#include <ESP32Servo.h>
 
 PMRC::PMRC(String name)
 {
- 
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  _myservo.setPeriodHertz(50);    // standard 50 hz servo
+  _myservo.attach(23, 600, 2500); // attaches the servo on pin 18 to the servo object
   _name = name;
   _lightOn = false;
   _speed = 0x3;
@@ -33,11 +39,31 @@ void PMRC::setSpeed(byte value)
 {
   if ( _speed != value ) {
     _speed = value;
-    Serial.print("newspeed: ");
+    Serial.print("new Speed: ");
     Serial.println(value, HEX);
   }
 }
 
+void PMRC::setSteering(byte value)
+{
+  if ( _steering != value ) {
+    _steering = value;
+    int pos = map(value, 0, 0xFF, 45, 135);     // scale it to use it with the servo (value between 0 and 180)
+    _myservo.write(pos); // set the servo position according to the scaled valu
+    Serial.print("new Angle: ");
+    Serial.println(pos);
+  }
+}
+
+void PMRC::setMotor(byte value)
+{
+  if ( _motor != value ) {
+    _motor = value;
+    int power = _motor * _speed;
+    Serial.print("new Power: ");
+    Serial.println(power);
+  }
+}
 
 
 void PMRC::dash()

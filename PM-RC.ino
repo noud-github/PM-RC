@@ -11,10 +11,10 @@
 #define LED_BUILTIN 2
 
 volatile boolean deviceConnected = false;
-volatile byte val = 0x7F;
+byte currentval = 0x7F;
 
 PMRC pmrc("ESP32");
-Servo myservo;
+
 
 int pos = 0;    // variable to store the servo position
 // Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
@@ -24,9 +24,15 @@ int servoPin = 23;
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
+      pmrc.setSteering(0x7F);
+      pmrc.setLight(false);
+      
     };
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
+      pmrc.setSteering(0x7F);
+      pmrc.setLight(false);
+      
     }
 };
 
@@ -37,9 +43,10 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       if (value.length() == 3 ) {
         switch (value[0]){
           case 0x40:
-            Serial.print ("Steering: ");
-            Serial.print(value[1],HEX);
-            val = value[1];
+            //Serial.print ("Steering: ");
+            if (deviceConnected) { 
+              pmrc.setSteering(value[1]);
+            }
             break;
           case  0x24:
             //Serial.print ("light: ");
@@ -49,7 +56,10 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             }
             break;
           case  0x23:
-            Serial.print ("motor: ");
+            //Serial.print ("motor: ");
+            if (deviceConnected) {  
+              pmrc.setMotor(value[1]);
+            }
             break;
           case  0x25:
             //Serial.print ("speed: ");
@@ -73,12 +83,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   Serial.println(pmrc.getName());
-  ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  ESP32PWM::allocateTimer(2);
-  ESP32PWM::allocateTimer(3);
-  myservo.setPeriodHertz(50);    // standard 50 hz servo
-  myservo.attach(servoPin, 600, 2500); // attaches the servo on pin 18 to the servo object
+  
   BLEDevice::init("PM-RC ESP32");
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
@@ -122,10 +127,8 @@ void loop() {
     myservo.write(pos);    // tell servo to go to position in variable 'pos'
     delay(15);             // waits 15ms for the servo to reach the position
   */
-  //delay(2000);
+  delay(2000);
   
-  int pos = map(val, 0, 0xFF, 45, 135);     // scale it to use it with the servo (value between 0 and 180)
-  myservo.write(pos);                  // set the servo position according to the scaled value
-  delay(200);                          // wait for the servo to get there
+  //delay(20);                          // wait for the servo to get there
   
 }

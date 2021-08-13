@@ -7,7 +7,7 @@
 #ifndef PMRC_h
 #define PMRC_h
 
-
+#include <ESP32Servo.h>
 
 class PMRC
 {
@@ -18,11 +18,16 @@ class PMRC
     void setSpeed(byte value);
     void dash();
     String getName();
+    void setSteering(byte value);
+    void setMotor(byte value);
     
   private:
     String _name;
     bool _lightOn;
     byte _speed;
+    Servo _myservo;
+    byte _steering;
+    byte _motor;
 };
 
 #endif
