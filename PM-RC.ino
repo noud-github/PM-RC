@@ -2,23 +2,25 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include <BLE2902.h>
-#include "PMRC.h"
-#include <ESP32Servo.h>
+
+
+
 
 #define SERVICE_UUID        "bc2f4cc6-aaef-4351-9034-d66268e328f0"
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
 #define LED_BUILTIN 2
+#define SERVOPIN 23
+// Motor A
+#define motor1Pin1 27
+#define motor1Pin2 26
+#define enable1Pin 14 
+
+#include "PMRC.h"
 
 volatile boolean deviceConnected = false;
 byte currentval = 0x7F;
 
 PMRC pmrc("ESP32");
-
-
-int pos = 0;    // variable to store the servo position
-// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
-int servoPin = 23;
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -79,7 +81,13 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
+ 
+
+
+
 void setup() {
+  
+
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   Serial.println(pmrc.getName());
@@ -117,18 +125,12 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly
-  /*
-  for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    myservo.write(pos);    // tell servo to go to position in variable 'pos'
-    delay(15);             // waits 15ms for the servo to reach the position
-  }
-  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-    myservo.write(pos);    // tell servo to go to position in variable 'pos'
-    delay(15);             // waits 15ms for the servo to reach the position
-  */
-  delay(2000);
   
-  //delay(20);                          // wait for the servo to get there
+  static bool onof = false;
+  if (!deviceConnected) { 
+    pmrc.setLight(onof);
+    onof = !onof;
+  }
+  delay(500);  
   
 }
