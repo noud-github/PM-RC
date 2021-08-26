@@ -29,9 +29,6 @@
 #ifndef PMRC_h
 #define PMRC_h
 
-#define GPIO_PWM0A_OUT 12   //Declara GPIO 12 como PWM0A
-#define GPIO_PWM0B_OUT 14   //Declara GPIO 14 como PWM0B
-
 
 #include <ESP32Servo.h>
 
@@ -46,6 +43,8 @@ class PMRC
     String getName();
     void setSteering(byte value);
     void setMotor(byte value);
+    byte getSpeed();
+
     
   private:
     String _name;
@@ -56,10 +55,7 @@ class PMRC
     byte _steering;
     byte _motor;
     bool _forward;
-    void brushed_motor_forward(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
-    void brushed_motor_backward(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
-    void brushed_motor_stop(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num);
-
+   
     
 };
 

@@ -33,13 +33,13 @@ class MyServerCallbacks: public BLEServerCallbacks {
       //uint8_t dataValue[] = {0x25,0x1,0xFF}; 
       //pCharacteristic->setValue(dataValue, sizeof(dataValue));
       //pCharacteristic->notify();
+  
       
     };
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
       pmrc.setSteering(0x7F);
       pmrc.setLight(false);
-      
     }
 };
 
@@ -58,7 +58,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           case  0x24:
             //Serial.print ("light: ");
             if (deviceConnected) { 
-              pCharacteristic->notify(); 
+              if (pmrc.getSpeed() != 1) {
+                pCharacteristic->notify (); 
+              }
               pmrc.setLight(value[1] == 0x2);
             }
             break;
@@ -95,6 +97,16 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(17, OUTPUT);
+  pinMode(14, OUTPUT);
+  //set forward
+  digitalWrite(14, HIGH);
+  /*
+  digitalWrite(17, HIGH);
+  delayMicroseconds(800);
+  digitalWrite(17, LOW);
+  delayMicroseconds(800); 
+  digitalWrite(17, LOW);
+  */
   Serial.begin(115200);
   Serial.println(pmrc.getName());
   
