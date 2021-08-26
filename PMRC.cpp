@@ -7,6 +7,7 @@
 #include "Arduino.h"
 #include "PMRC.h"
 #include <ESP32Servo.h>
+#include "driver/mcpwm.h"
 
 PMRC::PMRC(String name)
 {
@@ -21,10 +22,28 @@ PMRC::PMRC(String name)
   pinMode(enable1Pin, OUTPUT);
   
   // configure LED PWM functionalitites
-  ledcSetup(pwmChannel, freq, resolution);
+  //ledcSetup(pwmChannel, freq, resolution);
   
   // attach the channel to the GPIO to be controlled
-  ledcAttachPin(enable1Pin, pwmChannel);
+  //ledcAttachPin(enable1Pin, pwmChannel);
+
+   //mcpwm_gpio_init(unidade PWM 0, saida A, porta GPIO)     => Instancia o MCPWM0A no pino GPIO_PWM0A_OUT declarado no começo do código
+  mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_PWM0A_OUT);
+ 
+  //mcpwm_gpio_init(unidade PWM 0, saida B, porta GPIO)     => Instancia o MCPWM0B no pino GPIO_PWM0B_OUT declarado no começo do código
+  mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, GPIO_PWM0B_OUT); 
+ 
+  mcpwm_config_t pwm_config;
+ 
+  pwm_config.frequency = 1000;                          //frequência = 500Hz,
+  pwm_config.cmpr_a = 0;                                //Ciclo de trabalho (duty cycle) do PWMxA = 0
+  pwm_config.cmpr_b = 0;                                //Ciclo de trabalho (duty cycle) do PWMxb = 0
+  pwm_config.counter_mode = MCPWM_UP_COUNTER;           //Para MCPWM assimetrico
+  pwm_config.duty_mode = MCPWM_DUTY_MODE_0;             //Define ciclo de trabalho em nível alto
+  //Inicia(Unidade 0, Timer 0, Config PWM)
+  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config); //Define PWM0A & PWM0B com as configurações acima
+
+
 
 
   
@@ -47,9 +66,25 @@ void PMRC::setLight(bool value)
     if (value) { 
       Serial.println("light_on"); 
       digitalWrite(LED_BUILTIN, HIGH); 
+      digitalWrite(17, HIGH);
+      delayMicroseconds(800);
+      digitalWrite(17, LOW);
+      delayMicroseconds(800); 
+      
     } else {
       Serial.println("light_off");
       digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(17, HIGH);
+      delayMicroseconds(800);
+      digitalWrite(17, LOW);
+      delayMicroseconds(800); 
+      digitalWrite(17, HIGH);
+      delayMicroseconds(800);
+      digitalWrite(17, LOW);
+      delayMicroseconds(800); 
+
+
+      
     }
     _lightOn = value;
   }
@@ -114,18 +149,45 @@ void PMRC::setMotor(byte value)
     
     if (Stop) {
       Serial.println("STOP");
-      ledcWrite(2, 0);
+      brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
+      //ledcWrite(2, 0);
       
     } else {
       Serial.print("forward: ");
       Serial.print(_forward);
       
       Serial.print(" new Power: ");
-      ledcWrite(2, _power);
+      //ledcWrite(2, _power);
+      brushed_motor_forward(MCPWM_UNIT_0, MCPWM_TIMER_0, _power);
       Serial.println(_power);
     }
   }
 }
+
+
+
+
+void PMRC::brushed_motor_forward(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle)
+{
+    mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_B);
+    mcpwm_set_duty(mcpwm_num, timer_num, MCPWM_OPR_A, duty_cycle);
+    mcpwm_set_duty_type(mcpwm_num, timer_num, MCPWM_OPR_A, MCPWM_DUTY_MODE_0);
+}
+ 
+void PMRC::brushed_motor_backward(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle)
+{
+    mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_A);
+    mcpwm_set_duty(mcpwm_num, timer_num, MCPWM_OPR_B, duty_cycle);
+    mcpwm_set_duty_type(mcpwm_num, timer_num, MCPWM_OPR_B, MCPWM_DUTY_MODE_0);
+}
+ 
+void PMRC::brushed_motor_stop(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num)
+{
+    mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_A); //Desliga o sinal do MCPWM no Operador A
+    mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_B); //Desliga o sinal do MCPWM no Operador B
+}
+
+
 
 
 void PMRC::dash()

@@ -6,6 +6,7 @@
 
 
 
+
 #define SERVICE_UUID        "bc2f4cc6-aaef-4351-9034-d66268e328f0"
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
 #define LED_BUILTIN 2
@@ -21,6 +22,7 @@ volatile boolean deviceConnected = false;
 byte currentval = 0x7F;
 
 PMRC pmrc("ESP32");
+BLECharacteristic* pCharacteristic = NULL;
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -28,6 +30,9 @@ class MyServerCallbacks: public BLEServerCallbacks {
       deviceConnected = true;
       pmrc.setSteering(0x7F);
       pmrc.setLight(false);
+      //uint8_t dataValue[] = {0x25,0x1,0xFF}; 
+      //pCharacteristic->setValue(dataValue, sizeof(dataValue));
+      //pCharacteristic->notify();
       
     };
     void onDisconnect(BLEServer* pServer) {
@@ -89,6 +94,7 @@ void setup() {
   
 
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(17, OUTPUT);
   Serial.begin(115200);
   Serial.println(pmrc.getName());
   
@@ -97,8 +103,16 @@ void setup() {
   pServer->setCallbacks(new MyServerCallbacks());
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
-
+  /*
   BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+                                         CHARACTERISTIC_UUID,
+                                         BLECharacteristic::PROPERTY_NOTIFY |
+                                         BLECharacteristic::PROPERTY_WRITE |
+                                         BLECharacteristic::PROPERTY_WRITE_NR
+                                       );
+
+*/
+ pCharacteristic = pService->createCharacteristic(
                                          CHARACTERISTIC_UUID,
                                          BLECharacteristic::PROPERTY_NOTIFY |
                                          BLECharacteristic::PROPERTY_WRITE |
@@ -131,6 +145,7 @@ void loop() {
     pmrc.setLight(onof);
     onof = !onof;
   }
+  
   delay(500);  
   
 }
