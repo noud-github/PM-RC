@@ -24,9 +24,12 @@ PMRC::PMRC(String name)
   
   // attach the channel to the GPIO to be controlled
   ledcAttachPin(enable1Pin, pwmChannel);
-
+  ledcWrite(2, 255 - 0);
+  digitalWrite(17, HIGH);
+  delayMicroseconds(800);
+  digitalWrite(17, LOW);
+  delayMicroseconds(800);
   
-
 
 
   

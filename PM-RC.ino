@@ -100,13 +100,6 @@ void setup() {
   pinMode(14, OUTPUT);
   //set forward
   digitalWrite(14, HIGH);
-  /*
-  digitalWrite(17, HIGH);
-  delayMicroseconds(800);
-  digitalWrite(17, LOW);
-  delayMicroseconds(800); 
-  digitalWrite(17, LOW);
-  */
   Serial.begin(115200);
   Serial.println(pmrc.getName());
   
