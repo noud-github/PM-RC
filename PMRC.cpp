@@ -11,21 +11,6 @@
 
 PMRC::PMRC(String name)
 {
-  // Setting PWM properties
-  const int freq = 30000;
-  const int pwmChannel = 2;
-  const int resolution = 8;
-  int dutyCycle = 200;
-  // sets the pins as outputs:
-  pinMode(motor1Pin1, OUTPUT);
-  pinMode(motor1Pin2, OUTPUT);
-  pinMode(enable1Pin, OUTPUT);
-  
-  // configure LED PWM functionalitites
-  //ledcSetup(pwmChannel, freq, resolution);
-  
-  // attach the channel to the GPIO to be controlled
-  //ledcAttachPin(enable1Pin, pwmChannel);
 
    //mcpwm_gpio_init(unidade PWM 0, saida A, porta GPIO)     => Instancia o MCPWM0A no pino GPIO_PWM0A_OUT declarado no começo do código
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_PWM0A_OUT);
