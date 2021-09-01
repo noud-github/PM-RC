@@ -39,6 +39,7 @@ class MyServerCallbacks: public BLEServerCallbacks {
       deviceConnected = false;
       pmrc.setSteering(0x7F);
       pmrc.setLight(false);
+      pmrc.onDiscconect();
       
     }
 };

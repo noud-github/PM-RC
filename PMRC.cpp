@@ -59,9 +59,6 @@ void PMRC::setLight(bool value)
     } else {
       Serial.println("light_off");
       digitalWrite(LED_BUILTIN, LOW);
-     
-
-
       
     }
     _lightOn = value;
@@ -103,27 +100,28 @@ void PMRC::setMotor(byte value)
     Serial.println(value);
     switch (_speed){
       case 1:
-        maxPower = 128; 
+        maxPower = 40; 
         // 50%
         break;
       case 2:
-        maxPower = 160; 
+        maxPower = 55; 
         // 62%
         break;
       case 3:
-        maxPower = 192; 
+        maxPower = 70; 
         // 75%
         break;
       case 4:
-        maxPower = 224; 
+        maxPower = 85; 
         // 87%
         break;
       case 5:
-        maxPower = 255;
+        maxPower = 100;
         //100%
         break;
     }
-    _power = map(value, 0, 128, 0, maxPower);
+    // Set speed -> PWM duty 0-100
+    _power = map(value, 0, 128, 10, maxPower);
     
     if (Stop) {
       Serial.println("STOP");
@@ -167,11 +165,14 @@ void PMRC::brushed_motor_stop(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num)
 {
     mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_A); //Desliga o sinal do MCPWM no Operador A
     mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_B); //Desliga o sinal do MCPWM no Operador B
-    //mcpwm_set_signal_high(mcpwm_num, timer_num, MCPWM_OPR_A); //Desliga o sinal do MCPWM no Operador A
-    //mcpwm_set_signal_high(mcpwm_num, timer_num, MCPWM_OPR_B); //Desliga o sinal do MCPWM no Operador B
+    
 }
 
 
+void PMRC::onDiscconect()
+{
+  brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
+}
 
 
 void PMRC::dash()

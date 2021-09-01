@@ -40,6 +40,7 @@ class PMRC
     String getName();
     void setSteering(byte value);
     void setMotor(byte value);
+    void onDiscconect();
     
   private:
     String _name;
