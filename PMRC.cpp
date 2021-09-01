@@ -66,22 +66,12 @@ void PMRC::setLight(bool value)
     if (value) { 
       Serial.println("light_on"); 
       digitalWrite(LED_BUILTIN, HIGH); 
-      digitalWrite(17, HIGH);
-      delayMicroseconds(800);
-      digitalWrite(17, LOW);
-      delayMicroseconds(800); 
+    
       
     } else {
       Serial.println("light_off");
       digitalWrite(LED_BUILTIN, LOW);
-      digitalWrite(17, HIGH);
-      delayMicroseconds(800);
-      digitalWrite(17, LOW);
-      delayMicroseconds(800); 
-      digitalWrite(17, HIGH);
-      delayMicroseconds(800);
-      digitalWrite(17, LOW);
-      delayMicroseconds(800); 
+     
 
 
       
