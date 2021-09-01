@@ -130,10 +130,14 @@ void PMRC::setMotor(byte value)
     } else {
       Serial.print("forward: ");
       Serial.print(_forward);
-      
+      if (_forward){
+        brushed_motor_forward(MCPWM_UNIT_0, MCPWM_TIMER_0, _power);
+      } else {
+        brushed_motor_backward(MCPWM_UNIT_0, MCPWM_TIMER_0, _power);
+      }
       Serial.print(" new Power: ");
-      //ledcWrite(2, _power);
-      brushed_motor_forward(MCPWM_UNIT_0, MCPWM_TIMER_0, _power);
+     
+      
       Serial.println(_power);
     }
   }
