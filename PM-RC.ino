@@ -11,10 +11,10 @@
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
 #define LED_BUILTIN 2
 #define SERVOPIN 23
-// Motor A
-#define motor1Pin1 27
-#define motor1Pin2 26
-#define enable1Pin 14 
+#define GPIO_PWM0A_OUT 26   
+#define GPIO_PWM0B_OUT 27
+
+
 
 #include "PMRC.h"
 
@@ -91,9 +91,14 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
 
 void setup() {
-  
-
+  /*
+  pinMode(GPIO_PWM0A_OUT, OUTPUT);
+  pinMode(GPIO_PWM0B_OUT, OUTPUT);    
+  digitalWrite(GPIO_PWM0A_OUT, LOW);
+  digitalWrite(GPIO_PWM0B_OUT, LOW);
+  */
   pinMode(LED_BUILTIN, OUTPUT);
+  
   pinMode(17, OUTPUT);
   Serial.begin(115200);
   Serial.println(pmrc.getName());
@@ -103,15 +108,7 @@ void setup() {
   pServer->setCallbacks(new MyServerCallbacks());
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
-  /*
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-                                         CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_NOTIFY |
-                                         BLECharacteristic::PROPERTY_WRITE |
-                                         BLECharacteristic::PROPERTY_WRITE_NR
-                                       );
-
-*/
+  
  pCharacteristic = pService->createCharacteristic(
                                          CHARACTERISTIC_UUID,
                                          BLECharacteristic::PROPERTY_NOTIFY |

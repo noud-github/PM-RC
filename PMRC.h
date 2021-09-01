@@ -14,24 +14,18 @@
 #define LED_BUILTIN 2
 #endif
 
-#ifndef motor1Pin1
-#define motor1Pin1 27
-#endif
 
-#ifndef motor1Pin2 
-#define motor1Pin2 26
-#endif
-
-#ifndef enable1Pin 
-#define enable1Pin 14 
-#endif
 
 #ifndef PMRC_h
 #define PMRC_h
 
-#define GPIO_PWM0A_OUT 12   //Declara GPIO 12 como PWM0A
-#define GPIO_PWM0B_OUT 14   //Declara GPIO 14 como PWM0B
+#ifndef GPIO_PWM0A_OUT
+#define GPIO_PWM0A_OUT 26   
+#endif
 
+#ifndef GPIO_PWM0B_OUT
+#define GPIO_PWM0B_OUT 27   
+#endif
 
 #include <ESP32Servo.h>
 

@@ -12,15 +12,16 @@
 PMRC::PMRC(String name)
 {
 
-   //mcpwm_gpio_init(unidade PWM 0, saida A, porta GPIO)     => Instancia o MCPWM0A no pino GPIO_PWM0A_OUT declarado no começo do código
+ 
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_PWM0A_OUT);
  
-  //mcpwm_gpio_init(unidade PWM 0, saida B, porta GPIO)     => Instancia o MCPWM0B no pino GPIO_PWM0B_OUT declarado no começo do código
+
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, GPIO_PWM0B_OUT); 
+  
  
   mcpwm_config_t pwm_config;
  
-  pwm_config.frequency = 1000;                          //frequência = 500Hz,
+  pwm_config.frequency = 500;                          //frequência = 500Hz,
   pwm_config.cmpr_a = 0;                                //Ciclo de trabalho (duty cycle) do PWMxA = 0
   pwm_config.cmpr_b = 0;                                //Ciclo de trabalho (duty cycle) do PWMxb = 0
   pwm_config.counter_mode = MCPWM_UP_COUNTER;           //Para MCPWM assimetrico
@@ -29,6 +30,8 @@ PMRC::PMRC(String name)
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config); //Define PWM0A & PWM0B com as configurações acima
 
 
+ 
+  
 
 
   
@@ -164,6 +167,8 @@ void PMRC::brushed_motor_stop(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num)
 {
     mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_A); //Desliga o sinal do MCPWM no Operador A
     mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_B); //Desliga o sinal do MCPWM no Operador B
+    //mcpwm_set_signal_high(mcpwm_num, timer_num, MCPWM_OPR_A); //Desliga o sinal do MCPWM no Operador A
+    //mcpwm_set_signal_high(mcpwm_num, timer_num, MCPWM_OPR_B); //Desliga o sinal do MCPWM no Operador B
 }
 
 
