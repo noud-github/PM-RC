@@ -21,18 +21,13 @@ PMRC::PMRC(String name)
  
   mcpwm_config_t pwm_config;
  
-  pwm_config.frequency = 500;                          //frequência = 500Hz,
-  pwm_config.cmpr_a = 0;                                //Ciclo de trabalho (duty cycle) do PWMxA = 0
-  pwm_config.cmpr_b = 0;                                //Ciclo de trabalho (duty cycle) do PWMxb = 0
-  pwm_config.counter_mode = MCPWM_UP_COUNTER;           //Para MCPWM assimetrico
-  pwm_config.duty_mode = MCPWM_DUTY_MODE_0;             //Define ciclo de trabalho em nível alto
+  pwm_config.frequency = 500;                         
+  pwm_config.cmpr_a = 0;                               
+  pwm_config.cmpr_b = 0;                                
+  pwm_config.counter_mode = MCPWM_UP_COUNTER;           
+  pwm_config.duty_mode = MCPWM_DUTY_MODE_0;             
   //Inicia(Unidade 0, Timer 0, Config PWM)
-  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config); //Define PWM0A & PWM0B com as configurações acima
-
-
- 
-  
-
+  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config); 
 
   
   ESP32PWM::allocateTimer(0);
@@ -54,11 +49,14 @@ void PMRC::setLight(bool value)
     if (value) { 
       Serial.println("light_on"); 
       digitalWrite(LED_BUILTIN, HIGH); 
-    
+      digitalWrite(LED_REAR_LEFT_RED, HIGH); 
+      digitalWrite(LED_REAR_RIGHT_RED, HIGH);
       
     } else {
       Serial.println("light_off");
       digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(LED_REAR_LEFT_RED, LOW);
+      digitalWrite(LED_REAR_RIGHT_RED, LOW);
       
     }
     _lightOn = value;
@@ -173,6 +171,7 @@ void PMRC::onDiscconect()
 {
   brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
 }
+
 
 
 void PMRC::dash()

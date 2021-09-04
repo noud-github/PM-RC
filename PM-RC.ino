@@ -13,7 +13,8 @@
 #define SERVOPIN 23
 #define GPIO_PWM0A_OUT 26   
 #define GPIO_PWM0B_OUT 27
-
+#define LED_REAR_LEFT_RED 22
+#define LED_REAR_RIGHT_RED 21
 
 
 #include "PMRC.h"
@@ -92,13 +93,10 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
 
 void setup() {
-  /*
-  pinMode(GPIO_PWM0A_OUT, OUTPUT);
-  pinMode(GPIO_PWM0B_OUT, OUTPUT);    
-  digitalWrite(GPIO_PWM0A_OUT, LOW);
-  digitalWrite(GPIO_PWM0B_OUT, LOW);
-  */
+  
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_REAR_LEFT_RED, OUTPUT);
+  pinMode(LED_REAR_RIGHT_RED, OUTPUT);
   
   pinMode(17, OUTPUT);
   Serial.begin(115200);
@@ -142,7 +140,7 @@ void loop() {
   if (!deviceConnected) { 
     pmrc.setLight(onof);
     onof = !onof;
-  }
+  } 
   
   delay(500);  
   

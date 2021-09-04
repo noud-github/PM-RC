@@ -10,11 +10,18 @@
 #define SERVOPIN 23
 #endif
 
+
 #ifndef LED_BUILDIN
 #define LED_BUILTIN 2
 #endif
 
+#ifndef  LED_REAR_LEFT_RED
+#define LED_REAR_LEFT_RED 22
+#endif
 
+#ifndef LED_REAR_RIGHT_RED
+#define LED_REAR_RIGHT_RED 21
+#endif
 
 #ifndef PMRC_h
 #define PMRC_h
@@ -26,6 +33,9 @@
 #ifndef GPIO_PWM0B_OUT
 #define GPIO_PWM0B_OUT 27   
 #endif
+
+
+
 
 #include <ESP32Servo.h>
 
