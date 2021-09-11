@@ -3,10 +3,6 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 
-
-
-
-
 #define SERVICE_UUID        "bc2f4cc6-aaef-4351-9034-d66268e328f0"
 #define CHARACTERISTIC_UUID "06d1e5e7-79ad-4a71-8faa-373789f7d93c"
 #define LED_BUILTIN 2
@@ -18,32 +14,14 @@
 
 
 #include "PMRC.h"
+#include "RCBSI.h"
 
 volatile boolean deviceConnected = false;
 byte currentval = 0x7F;
 
-TaskHandle_t task1Handle = NULL;
-
-
 PMRC pmrc("ESP32");
 BLECharacteristic* pCharacteristic = NULL;
-
-
-void toggleLED(void * parameter){
-  static bool onof = false;
-  for(;;){ // infinite loop
-
-    // Turn the LED on
-    digitalWrite(LED_REAR_LEFT_RED, onof); 
-    digitalWrite(LED_REAR_RIGHT_RED, !onof);
-    onof = !onof;
- 
-    // Pause the task for 500ms
-    vTaskDelay(250 / portTICK_PERIOD_MS);
-
-   
-  }
-}
+RCBSI rcbsi("bsi");
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -54,28 +32,16 @@ class MyServerCallbacks: public BLEServerCallbacks {
       //uint8_t dataValue[] = {0x25,0x1,0xFF}; 
       //pCharacteristic->setValue(dataValue, sizeof(dataValue));
       //pCharacteristic->notify();
-      digitalWrite(LED_REAR_LEFT_RED, LOW); 
-      digitalWrite(LED_REAR_RIGHT_RED, LOW);
-      if(task1Handle != NULL) {
-        vTaskDelete(task1Handle);
-      }
-      
+      rcbsi.blinkRearLEDs(false);   
     };
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
+      BLEAdvertising *pAdvertising = pServer->getAdvertising();
+      pAdvertising->start();
       pmrc.setSteering(0x7F);
       pmrc.setLight(false);
       pmrc.onDiscconect();
-      digitalWrite(LED_REAR_LEFT_RED, LOW); 
-      digitalWrite(LED_REAR_RIGHT_RED, LOW);
-      xTaskCreate(
-        toggleLED,    // Function that should be called
-        "Toggle LED",   // Name of the task (for debugging)
-        1000,            // Stack size (bytes)
-        NULL,            // Parameter to pass
-        1,               // Task priority
-        &task1Handle     // Task handle
-      );
+      rcbsi.blinkRearLEDs(true);
       
     }
 };
@@ -124,20 +90,12 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 };
 
 
-
-
-
- 
-
-
-
 void setup() {
   
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(LED_REAR_LEFT_RED, OUTPUT);
-  pinMode(LED_REAR_RIGHT_RED, OUTPUT);
   
-  pinMode(17, OUTPUT);
+  
+  //pinMode(17, OUTPUT);
   Serial.begin(115200);
   Serial.println(pmrc.getName());
   
@@ -147,12 +105,12 @@ void setup() {
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
   
- pCharacteristic = pService->createCharacteristic(
-                                         CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_NOTIFY |
-                                         BLECharacteristic::PROPERTY_WRITE |
-                                         BLECharacteristic::PROPERTY_WRITE_NR
-                                       );
+  pCharacteristic = pService->createCharacteristic(
+    CHARACTERISTIC_UUID,
+    BLECharacteristic::PROPERTY_NOTIFY |
+    BLECharacteristic::PROPERTY_WRITE |
+    BLECharacteristic::PROPERTY_WRITE_NR
+  );
 
   BLEDescriptor *pDescriptor = new BLEDescriptor((uint16_t)0x2902); // Characteristic Presentation Format
  
@@ -167,16 +125,7 @@ void setup() {
   pAdvertising->addServiceUUID(SERVICE_UUID);
   
   pAdvertising->start();
-
-  xTaskCreate(
-    toggleLED,    // Function that should be called
-    "Toggle LED",   // Name of the task (for debugging)
-    1000,            // Stack size (bytes)
-    NULL,            // Parameter to pass
-    1,               // Task priority
-    &task1Handle             // Task handle
-  );
-
+  rcbsi.blinkRearLEDs(true);
 }
 
 
