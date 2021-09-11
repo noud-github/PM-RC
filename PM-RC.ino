@@ -22,8 +22,28 @@
 volatile boolean deviceConnected = false;
 byte currentval = 0x7F;
 
+TaskHandle_t task1Handle = NULL;
+
+
 PMRC pmrc("ESP32");
 BLECharacteristic* pCharacteristic = NULL;
+
+
+void toggleLED(void * parameter){
+  static bool onof = false;
+  for(;;){ // infinite loop
+
+    // Turn the LED on
+    digitalWrite(LED_REAR_LEFT_RED, onof); 
+    digitalWrite(LED_REAR_RIGHT_RED, !onof);
+    onof = !onof;
+ 
+    // Pause the task for 500ms
+    vTaskDelay(250 / portTICK_PERIOD_MS);
+
+   
+  }
+}
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -34,6 +54,11 @@ class MyServerCallbacks: public BLEServerCallbacks {
       //uint8_t dataValue[] = {0x25,0x1,0xFF}; 
       //pCharacteristic->setValue(dataValue, sizeof(dataValue));
       //pCharacteristic->notify();
+      digitalWrite(LED_REAR_LEFT_RED, LOW); 
+      digitalWrite(LED_REAR_RIGHT_RED, LOW);
+      if(task1Handle != NULL) {
+        vTaskDelete(task1Handle);
+      }
       
     };
     void onDisconnect(BLEServer* pServer) {
@@ -41,6 +66,16 @@ class MyServerCallbacks: public BLEServerCallbacks {
       pmrc.setSteering(0x7F);
       pmrc.setLight(false);
       pmrc.onDiscconect();
+      digitalWrite(LED_REAR_LEFT_RED, LOW); 
+      digitalWrite(LED_REAR_RIGHT_RED, LOW);
+      xTaskCreate(
+        toggleLED,    // Function that should be called
+        "Toggle LED",   // Name of the task (for debugging)
+        1000,            // Stack size (bytes)
+        NULL,            // Parameter to pass
+        1,               // Task priority
+        &task1Handle     // Task handle
+      );
       
     }
 };
@@ -88,6 +123,10 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
+
+
+
+
  
 
 
@@ -128,6 +167,15 @@ void setup() {
   pAdvertising->addServiceUUID(SERVICE_UUID);
   
   pAdvertising->start();
+
+  xTaskCreate(
+    toggleLED,    // Function that should be called
+    "Toggle LED",   // Name of the task (for debugging)
+    1000,            // Stack size (bytes)
+    NULL,            // Parameter to pass
+    1,               // Task priority
+    &task1Handle             // Task handle
+  );
 
 }
 

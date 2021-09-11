@@ -49,14 +49,14 @@ void PMRC::setLight(bool value)
     if (value) { 
       Serial.println("light_on"); 
       digitalWrite(LED_BUILTIN, HIGH); 
-      digitalWrite(LED_REAR_LEFT_RED, HIGH); 
-      digitalWrite(LED_REAR_RIGHT_RED, HIGH);
+      //digitalWrite(LED_REAR_LEFT_RED, HIGH); 
+      //digitalWrite(LED_REAR_RIGHT_RED, HIGH);
       
     } else {
       Serial.println("light_off");
       digitalWrite(LED_BUILTIN, LOW);
-      digitalWrite(LED_REAR_LEFT_RED, LOW);
-      digitalWrite(LED_REAR_RIGHT_RED, LOW);
+      //digitalWrite(LED_REAR_LEFT_RED, LOW);
+      //digitalWrite(LED_REAR_RIGHT_RED, LOW);
       
     }
     _lightOn = value;
