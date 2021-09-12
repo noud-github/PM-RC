@@ -27,20 +27,13 @@ BLECharacteristic* pCharacteristic = NULL;
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
-      pmrc.onConnect();
-      
-      //uint8_t dataValue[] = {0x25,0x1,0xFF}; 
-      //pCharacteristic->setValue(dataValue, sizeof(dataValue));
-      //pCharacteristic->notify();
-         
+      pmrc.onConnect();   
     };
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
       BLEAdvertising *pAdvertising = pServer->getAdvertising();
       pAdvertising->start();
       pmrc.onDisconnect();
-      
-      
     }
 };
 
