@@ -21,27 +21,25 @@ byte currentval = 0x7F;
 
 PMRC pmrc("ESP32");
 BLECharacteristic* pCharacteristic = NULL;
-RCBSI rcbsi("bsi");
+
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
-      pmrc.setSteering(0x7F);
-      pmrc.setLight(false);
+      pmrc.onConnect();
+      
       //uint8_t dataValue[] = {0x25,0x1,0xFF}; 
       //pCharacteristic->setValue(dataValue, sizeof(dataValue));
       //pCharacteristic->notify();
-      rcbsi.blinkRearLEDs(false);   
+         
     };
     void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
       BLEAdvertising *pAdvertising = pServer->getAdvertising();
       pAdvertising->start();
-      pmrc.setSteering(0x7F);
-      pmrc.setLight(false);
-      pmrc.onDiscconect();
-      rcbsi.blinkRearLEDs(true);
+      pmrc.onDisconnect();
+      
       
     }
 };
@@ -125,7 +123,7 @@ void setup() {
   pAdvertising->addServiceUUID(SERVICE_UUID);
   
   pAdvertising->start();
-  rcbsi.blinkRearLEDs(true);
+  
 }
 
 
@@ -135,7 +133,7 @@ void loop() {
   
   static bool onof = false;
   if (!deviceConnected) { 
-    pmrc.setLight(onof);
+    digitalWrite(LED_BUILTIN, onof);
     onof = !onof;
   } 
   

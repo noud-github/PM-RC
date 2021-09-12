@@ -15,13 +15,7 @@
 #define LED_BUILTIN 2
 #endif
 
-#ifndef  LED_REAR_LEFT_RED
-#define LED_REAR_LEFT_RED 22
-#endif
 
-#ifndef LED_REAR_RIGHT_RED
-#define LED_REAR_RIGHT_RED 21
-#endif
 
 #ifndef PMRC_h
 #define PMRC_h
@@ -38,6 +32,7 @@
 
 
 #include <ESP32Servo.h>
+#include "RCBSI.h"
 
 class PMRC
 {
@@ -46,11 +41,11 @@ class PMRC
     void setLight(bool value);
     bool getLight();
     void setSpeed(byte value);
-    void dash();
     String getName();
     void setSteering(byte value);
     void setMotor(byte value);
-    void onDiscconect();
+    void onDisconnect();
+    void onConnect();
     
   private:
     String _name;
@@ -58,6 +53,7 @@ class PMRC
     byte _speed;
     byte _power;
     Servo _myservo;
+    RCBSI *_mybsi;
     byte _steering;
     byte _motor;
     bool _forward;

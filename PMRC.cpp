@@ -8,17 +8,15 @@
 #include "PMRC.h"
 #include <ESP32Servo.h>
 #include "driver/mcpwm.h"
+#include "RCBSI.h"
+
 
 PMRC::PMRC(String name)
 {
-
  
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_PWM0A_OUT);
- 
 
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, GPIO_PWM0B_OUT); 
-  
- 
   mcpwm_config_t pwm_config;
  
   pwm_config.frequency = 500;                         
@@ -29,7 +27,6 @@ PMRC::PMRC(String name)
   //Inicia(Unidade 0, Timer 0, Config PWM)
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config); 
 
-  
   ESP32PWM::allocateTimer(0);
   //ESP32PWM::allocateTimer(1);
   //ESP32PWM::allocateTimer(2);
@@ -41,26 +38,13 @@ PMRC::PMRC(String name)
   _speed = 0x3;
   _power = 0;
   _forward = true;
+  _mybsi = new RCBSI("bsi");
+  
 }
 
 void PMRC::setLight(bool value)
 {
-  if (_lightOn != value){
-    if (value) { 
-      Serial.println("light_on"); 
-      digitalWrite(LED_BUILTIN, HIGH); 
-      //digitalWrite(LED_REAR_LEFT_RED, HIGH); 
-      //digitalWrite(LED_REAR_RIGHT_RED, HIGH);
-      
-    } else {
-      Serial.println("light_off");
-      digitalWrite(LED_BUILTIN, LOW);
-      //digitalWrite(LED_REAR_LEFT_RED, LOW);
-      //digitalWrite(LED_REAR_RIGHT_RED, LOW);
-      
-    }
-    _lightOn = value;
-  }
+  _mybsi->lightOn(value);
 }
 
 void PMRC::setSpeed(byte value)
@@ -167,19 +151,20 @@ void PMRC::brushed_motor_stop(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num)
 }
 
 
-void PMRC::onDiscconect()
+void PMRC::onDisconnect()
 {
   brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
+  this->setLight(false);
+  this->setSteering(0x7F);
+  _mybsi->blinkRearLEDs(true);
 }
 
-
-
-void PMRC::dash()
+void PMRC::onConnect()
 {
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(1000);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(250);
+  brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
+  this->setLight(false);
+  this->setSteering(0x7F);
+  _mybsi->blinkRearLEDs(false);
 }
 
 String PMRC::getName() {

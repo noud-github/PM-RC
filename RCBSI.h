@@ -9,6 +9,9 @@
 #define LED_REAR_RIGHT_RED 21
 #endif
 
+#ifndef LED_BUILDIN
+#define LED_BUILTIN 2
+#endif
 
 
 
@@ -26,11 +29,14 @@ class RCBSI
     RCBSI(String name);
     //LED_STATE_STRUCT LED1;
     void blinkRearLEDs(bool value);
+    void lightOn(bool value);
       
   private:
     String _name;
     static void toggleRearLED(void * parameter);
     TaskHandle_t task1Handle;
+    bool _lightOn;
+    bool _blinkRearLEDs;
 
   
     
