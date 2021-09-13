@@ -39,7 +39,6 @@ class PMRC
   public:
     PMRC(String name);
     void setLight(bool value);
-    bool getLight();
     void setSpeed(byte value);
     String getName();
     void setSteering(byte value);
@@ -49,7 +48,6 @@ class PMRC
     
   private:
     String _name;
-    bool _lightOn;
     byte _speed;
     byte _power;
     Servo _myservo;

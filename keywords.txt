@@ -1,3 +1,4 @@
 setLight    KEYWORD1
-setSteering    KEYWORD1
+setSteering KEYWORD1
 setSpeed    KEYWORD1
+setMotor    KEYWORD1

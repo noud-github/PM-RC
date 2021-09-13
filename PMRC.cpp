@@ -34,7 +34,6 @@ PMRC::PMRC(String name)
   _myservo.setPeriodHertz(50);    // standard 50 hz servo
   _myservo.attach(SERVOPIN, 600, 2500); // attaches the servo on pin 18 to the servo object
   _name = name;
-  _lightOn = false;
   _speed = 0x3;
   _power = 0;
   _forward = true;
@@ -170,7 +169,3 @@ void PMRC::onConnect()
 String PMRC::getName() {
   return "PM-RC " + _name;
 } // getValue
-
-bool PMRC::getLight() {
-  return _lightOn;
-}
