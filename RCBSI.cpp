@@ -2,7 +2,7 @@
 #include "RCBSI.h"
 
 
-RCBSI::RCBSI(String name)
+RCBSI::RCBSI(std::string name)
 {
  _name = name;
  pinMode(LED_REAR_LEFT_RED, OUTPUT);
@@ -34,7 +34,6 @@ void RCBSI::lightOn(bool value)
   }
 }
 
-
 void RCBSI::blinkRearLEDs(bool value)
 {
   if (_blinkRearLEDs != value){
@@ -64,6 +63,10 @@ void RCBSI::toggleRearLED(void * parameter){
   bool onof = false;
   for(;;){ // infinite loop
     // Turn the LED on
+    /*if (m_pRCBSICallbacks != nullptr) {
+        m_pRCBSICallbacks->onConnect(this);    
+      }
+    */
     digitalWrite(LED_REAR_LEFT_RED, onof); 
     digitalWrite(LED_REAR_RIGHT_RED, !onof);
     onof = !onof;
@@ -71,3 +74,11 @@ void RCBSI::toggleRearLED(void * parameter){
     vTaskDelay(250 / portTICK_PERIOD_MS);
   }
 }
+
+std::string RCBSI::getName() {
+  return "PM-RC " + _name;
+} // getValue
+
+void RCBSI::setCallbacks(RCBSICallbacks* pCallbacks) {
+  m_pRCBSICallbacks = pCallbacks;
+} // setCallbacks

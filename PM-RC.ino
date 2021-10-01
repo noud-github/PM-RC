@@ -12,16 +12,12 @@
 #define LED_REAR_LEFT_RED 22
 #define LED_REAR_RIGHT_RED 21
 
-
 #include "PMRC.h"
-#include "RCBSI.h"
 
 volatile boolean deviceConnected = false;
-byte currentval = 0x7F;
 
 PMRC pmrc("ESP32");
 BLECharacteristic* pCharacteristic = NULL;
-
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -53,7 +49,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
             //Serial.print ("light: ");
             if (deviceConnected) { 
               pCharacteristic->notify(); 
-              pmrc.setLight(value[1] == 0x2);
+              pmrc.lightOn(value[1] == 0x2);
             }
             break;
           case  0x23:
@@ -88,9 +84,9 @@ void setup() {
   
   //pinMode(17, OUTPUT);
   Serial.begin(115200);
-  Serial.println(pmrc.getName());
+  Serial.println(pmrc.getName().c_str());
   
-  BLEDevice::init("PM-RC ESP32");
+  BLEDevice::init(pmrc.getName());
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 

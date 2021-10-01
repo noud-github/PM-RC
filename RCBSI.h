@@ -13,7 +13,7 @@
 #define LED_BUILTIN 2
 #endif
 
-
+class RCBSICallbacks;
 
 typedef struct {
   bool on;
@@ -22,24 +22,37 @@ typedef struct {
   } LED_STATE_STRUCT;
 
 
-
 class RCBSI
 {
   public:
-    RCBSI(String name);
+    void setCallbacks(RCBSICallbacks* pCallbacks); 
+    RCBSI(std::string name);
     //LED_STATE_STRUCT LED1;
     void blinkRearLEDs(bool value);
     void lightOn(bool value);
+    std::string getName();
       
   private:
-    String _name;
+    std::string _name;
     static void toggleRearLED(void * parameter);
     TaskHandle_t task1Handle;
     bool _lightOn;
     bool _blinkRearLEDs;
-
-  
-    
+    RCBSICallbacks* m_pRCBSICallbacks = nullptr;
+      
 };
+
+class RCBSICallbacks {
+public:
+  virtual ~RCBSICallbacks() {};
+  
+  virtual void onConnect(RCBSI* pServer);
+  
+  virtual void onDisconnect(RCBSI* pServer);
+
+}; // RCBSICallbacks
+
+
+
 
 #endif

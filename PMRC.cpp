@@ -11,11 +11,10 @@
 #include "RCBSI.h"
 
 
-PMRC::PMRC(String name)
+PMRC::PMRC(std::string name) : RCBSI(name)
 {
  
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_PWM0A_OUT);
-
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, GPIO_PWM0B_OUT); 
   mcpwm_config_t pwm_config;
  
@@ -37,14 +36,12 @@ PMRC::PMRC(String name)
   _speed = 0x3;
   _power = 0;
   _forward = true;
-  _mybsi = new RCBSI("bsi");
+ 
   
 }
 
-void PMRC::setLight(bool value)
-{
-  _mybsi->lightOn(value);
-}
+
+
 
 void PMRC::setSpeed(byte value)
 {
@@ -153,19 +150,15 @@ void PMRC::brushed_motor_stop(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num)
 void PMRC::onDisconnect()
 {
   brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
-  this->setLight(false);
+  this->lightOn(false);
   this->setSteering(0x7F);
-  _mybsi->blinkRearLEDs(true);
+  this->blinkRearLEDs(true);
 }
 
 void PMRC::onConnect()
 {
   brushed_motor_stop(MCPWM_UNIT_0, MCPWM_TIMER_0);
-  this->setLight(false);
+  this->lightOn(false);
   this->setSteering(0x7F);
-  _mybsi->blinkRearLEDs(false);
+  this->blinkRearLEDs(false);
 }
-
-String PMRC::getName() {
-  return "PM-RC " + _name;
-} // getValue

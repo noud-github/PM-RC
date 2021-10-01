@@ -5,6 +5,9 @@
 */
 
 #include "driver/mcpwm.h"
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
 
 #ifndef SERVOPIN 
 #define SERVOPIN 23
@@ -34,24 +37,22 @@
 #include <ESP32Servo.h>
 #include "RCBSI.h"
 
-class PMRC
+class PMRC : public RCBSI
 {
   public:
-    PMRC(String name);
-    void setLight(bool value);
+    PMRC(std::string name);
     void setSpeed(byte value);
-    String getName();
     void setSteering(byte value);
     void setMotor(byte value);
     void onDisconnect();
     void onConnect();
     
   private:
-    String _name;
+    volatile boolean deviceConnected;
+    std::string _name;
     byte _speed;
     byte _power;
     Servo _myservo;
-    RCBSI *_mybsi;
     byte _steering;
     byte _motor;
     bool _forward;
@@ -61,5 +62,7 @@ class PMRC
 
     
 };
+
+
 
 #endif
